@@ -5,6 +5,7 @@ import random
 from route_planner import RoutePlanner
 from world import World
 from drone import Drone
+from message_dispatcher import MessageDispatcher
 
 
 
@@ -16,7 +17,12 @@ class DroneSimulator:
         #self.world.random()
         self.world.generate()
 
-        self.drones = [Drone(self.world), Drone(self.world), Drone(self.world)]
+        # drones may have different charaterisics, battery size, max lift, max weight carrying capacity, turning abilities? some might make only right turns?
+        self.message_dispatcher = MessageDispatcher()
+        self.drone_alpha = Drone('URBAN0X1', self.world,self.message_dispatcher, cooperate=True)
+        self.drone_beta = Drone('URBAN0X2', self.world,self.message_dispatcher, cooperate=True)
+        self.drone_gamma = Drone('URBAN0X3', self.world,self.message_dispatcher, cooperate=False)
+        self.drones = [self.drone_alpha,self.drone_beta,self.drone_gamma]
         self.drone_world_plots = []
 
 
@@ -55,7 +61,7 @@ class DroneSimulator:
         for i,drone in enumerate(self.drones):
             plot_location = int(str(self.fig_rows)+str(self.fig_images)+ str(i+2))
             print(plot_location)
-            drone_world_plot = self.create_plot(location=plot_location, title='Drone World', data=self.drones[0].world.map, plot_cmap='Blues', plot_interpolation='nearest', plot_vmin=self.drones[0].world.MIN_OBJECT_HEIGHT, plot_vmax=self.drones[0].world.MAX_OBJECT_HEIGHT)
+            drone_world_plot = self.create_plot(location=plot_location, title='Drone '+drone.uid+ ' View', data=self.drones[0].world.map, plot_cmap='Blues', plot_interpolation='nearest', plot_vmin=self.drones[0].world.MIN_OBJECT_HEIGHT, plot_vmax=self.drones[0].world.MAX_OBJECT_HEIGHT)
             self.drone_world_plots.append(drone_world_plot)
 
 
@@ -65,7 +71,8 @@ class DroneSimulator:
         for i,drone in enumerate(self.drones):
             drone.move()
             self.drone_world_plots[i].set_data(drone.world.map)
-
+            #self.drone_world_plots.gca().plot
+            #self.world_plot.plot(drone.location[0], drone.location[1], marker='o', markersize=3, color="red")
         #for drone_world_plot in self.drone_world_plots
         #    self.drone_world_plot_0.set_data(self.drones[0].world.map)
 
