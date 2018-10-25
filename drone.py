@@ -12,20 +12,36 @@ class Drone:
         self.actual_world = world
         self.block = np.array([[-1,-1],[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0]])
         #self.block = np.array([[-1,-1],[0,-1],[1,-1],[1,0],[0,0],[1,1],[0,1],[-1,1],[-1,0]])
-        self.location = [int(self.actual_world.y_max/2), int(self.actual_world.x_max/2)]
-        self.drone_height = int(self.actual_world.MAX_OBJECT_HEIGHT/2)
 
         #put drones in the actual_world
-        self.under_drone_map_value = self.actual_world.map[tuple(self.location)]
-        self.actual_world.map[tuple(self.location)] = self.drone_height
+        self.location = [int(self.actual_world.y_max/2), int(self.actual_world.x_max/2)]
+        if self.actual_world.map[tuple(self.location)] is 0:
+            self.drone_height = int(self.actual_world.MAX_OBJECT_HEIGHT/2)
+        else:
+            self.drone_height = 5 + self.actual_world.map[tuple(self.location)] #int(self.actual_world.MAX_OBJECT_HEIGHT/2)
+        #self.location_as_grid = np.zeros((self.actual_world.y_max, self.actual_world.x_max))
+        #self.under_drone_map_value = self.actual_world.map[tuple(self.location)]
+        #self.actual_world.map[tuple(self.location)] = self.drone_height
+
+        # Views, to be set by the simulator
+        self.world_plot = None
+        self.world_image = None
+        self.location_plot = None
 
         # this is what the drone believes about the world
         self.world = World(self.actual_world.x_max, self.actual_world.y_max)
+
 
         # cooperation
         self.cooperate = cooperate
         self.message_dispatcher = message_dispatcher
         self.message_dispatcher.register(self)
+
+        # profile
+        self.owner = 'COMPANY-'+random.choice(['X','Y','Z'])
+
+        # goal is pick & drop for all drones
+        # self.goal =
 
     def receive(self, message):
         if self.cooperate:
@@ -64,9 +80,10 @@ class Drone:
                 if self.actual_world.map[tuple(point)] < self.drone_height:
                     valid_points.append(point)
 
-        drone_new_location = random.choice (valid_points)
-        #print('Drone-location:', drone_new_location)
-        self.move_to_point(drone_new_location)
+        if len(valid_points):
+            drone_new_location = random.choice (valid_points)
+            #print('Drone-location:', drone_new_location)
+            self.move_to_point(drone_new_location)
 
     def share_info(self,points):
         share_points = []
@@ -86,8 +103,18 @@ class Drone:
 
 
     def move_to_point (self, point):
-        self.actual_world.map[tuple(self.location)] = self.under_drone_map_value
-        self.under_drone_map_value = self.actual_world.map[tuple(point)]
+        #self.actual_world.map[tuple(self.location)] = self.under_drone_map_value
+        #self.under_drone_map_value = self.actual_world.map[tuple(point)]
 
-        self.actual_world.map[tuple(point)] = self.drone_height
+        #self.actual_world.map[tuple(point)] = self.drone_height
         self.location = point
+
+        #self.location_as_grid[tuple(self.location)] = 0
+        #self.location_as_grid[tuple(point)] = self.drone_height
+
+#    def move_to_point (self, point):
+#        self.actual_world.map[tuple(self.location)] = self.under_drone_map_value
+#        self.under_drone_map_value = self.actual_world.map[tuple(point)]
+#
+#        self.actual_world.map[tuple(point)] = self.drone_height
+#        self.location = point
