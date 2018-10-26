@@ -15,21 +15,27 @@ class DroneSimulator:
         self.y_max = 50
         self.world = World(self.x_max, self.y_max)
         #self.world.random()
-        self.world.generate()
+        self.world.generate(resource_points=True, drop_points = True, recharge_points=True)
 
         # drones may have different charaterisics, battery size, max lift, max weight carrying capacity, turning abilities? some might make only right turns?
+        self.drones = []
+        self.drone_world_plots = []
+
         self.message_dispatcher = MessageDispatcher()
         self.drone_alpha = Drone('URBAN0X1', self.world,self.message_dispatcher, cooperate=True)
-        self.drone_beta = Drone('URBAN0X2', self.world,self.message_dispatcher, cooperate=True)
-        self.drone_gamma = Drone('URBAN0X3', self.world,self.message_dispatcher, cooperate=False)
-        self.drones = [self.drone_alpha,self.drone_beta,self.drone_gamma]
-        self.drone_world_plots = []
+        self.drones.append(self.drone_alpha)
+
+        #self.drone_beta = Drone('URBAN0X2', self.world,self.message_dispatcher, cooperate=True)
+        #self.drones.append(self.drone_alpha)
+
+        #self.drone_gamma = Drone('URBAN0X3', self.world,self.message_dispatcher, cooperate=False)
+        #self.drones.append(self.drone_alpha)
+
 
 
         #self.fig = plt.figure(figsize=(1, 2))#, dpi=80, facecolor='w', edgecolor='k')
         self.drop_point_marker = 'o'
-        #self.drop_point_locations = [random.sample(range(self.world.x_max), 10), random.sample(range(self.world.y_max), 10)]
-        self.drop_point_locations = [[5,10,20,40,45],[5,10,20,40,45]]
+        #self.world.drop_point_locations = [random.sample(range(self.world.x_max), 10), random.sample(range(self.world.y_max), 10)]
         self.drop_point_plot = None
 
         #reacharge point
@@ -37,11 +43,9 @@ class DroneSimulator:
 
         #resources
         #self.fig = plt.figure(figsize=(1, 2))#, dpi=80, facecolor='w', edgecolor='k')
-        self.resource_marker = 'v'
-        self.resource_locations = [random.sample(range(self.world.x_max), 10), random.sample(range(self.world.y_max), 10)]
-        #self.resource_locations = [[5,10,20,40,45],[5,10,20,40,45]]
+        #self.world.resource_locations = [[5,10,20,40,45],[5,10,20,40,45]]
         self.resource_plot = None
-
+        self.resource_marker = 'v'
 
         self.markers = ['|','+','x','*']
         self.colors = ['r','k','g','c','m','b']
@@ -98,10 +102,12 @@ class DroneSimulator:
         self.world_image = self.world_plot.imshow(self.world.map, cmap='Blues', interpolation='nearest', vmin=self.world.MIN_OBJECT_HEIGHT, vmax=self.world.MAX_OBJECT_HEIGHT, animated=False)
 
         #Let there be drop points
-        self.drop_point_plot = (self.world_plot.plot(self.drop_point_locations[1], self.drop_point_locations[0], color=self.colors.pop(), linestyle='', marker=self.drop_point_marker, markerfacecolor='white', markersize=3))[0]
+        self.drop_point_plot = (self.world_plot.plot(self.world.drop_points[1], self.world.drop_points[0], color=self.colors.pop(), linestyle='', marker=self.drop_point_marker, markerfacecolor='white', markersize=3))[0]
 
         #Let there be resources
-        self.resource_plot = (self.world_plot.plot(self.resource_locations[1], self.resource_locations[0], color=self.colors.pop(), linestyle='', marker=self.resource_marker, markerfacecolor='white', markersize=3))[0]
+        x, y = self.world.get_resource_points()
+        self.resource_plot = (self.world_plot.plot(x, y, color=self.colors.pop(), linestyle='', marker=self.resource_marker, markerfacecolor='white', markersize=3))[0]
+        #plt.gca().invert_yaxis()
 
         #Let there be recharge points
 
@@ -140,6 +146,8 @@ class DroneSimulator:
         #    self.drone_world_plot_0.set_data(self.drones[0].world.map)
 
         self.world_image.set_data(self.world.map)
+        x, y = self.world.get_resource_points()
+        self.resource_plot.set_data([x],[y])
         #self.world_drone_plot.set_data([drone_locations_x,drone_locations_y])
         #self.im.set_array(self.luminosity)
         #self.im.set_facecolors(self.luminosity)

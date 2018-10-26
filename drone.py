@@ -5,6 +5,7 @@ import random
 from route_planner import RoutePlanner
 from world import World
 from message import Message
+from search.astar import astar
 
 class Drone:
     def __init__(self, uid, world, message_dispatcher, cooperate):
@@ -42,6 +43,8 @@ class Drone:
 
         # goal is pick & drop for all drones
         # self.goal =
+        self.paths = []
+        self.current_path = []
 
     def receive(self, message):
         if self.cooperate:
@@ -58,7 +61,31 @@ class Drone:
             self.message_dispatcher.broadcast(message)
 
     def move(self):
-        self.move_random_by_height()
+        print('Drone {} Height:{}'.format(self.uid, self.drone_height))
+        if len(self.current_path) is 0:
+
+            self.impassable_map = (self.actual_world.map >  self.drone_height).astype(int)
+
+            print('impassable {}'.format(self.impassable_map))
+            start = tuple(self.location) #(0, 0)
+            #index = random.choice(range(len(self.actual_world.resource_points[0])))
+            #random.choice(self.actual_world.resource_objects)
+            obj_id, self.destination_object = random.choice(list(self.actual_world.resource_objects.items()))
+            # goal = (self.actual_world.resource_points[0][index], self.actual_world.resource_points[1][index])#(9, 9)
+            #self.goal_location = tuple(resource.location)
+            self.current_path = astar(self.impassable_map, start, tuple(self.destination_object.location), moore=True)
+            print(self.current_path)
+        else:
+            #point = self.current_path.pop(0)
+            #if len(self.current_path) is 1: # at destination
+            self.move_to_point(list(self.current_path.pop(0)))
+
+        if self.destination_object:
+            if self.location == self.destination_object.location:
+                self.destination_object.apply_drone(self)
+                self.destination_object = None
+
+        #self.move_random_by_height()
 
 
     def move_random (self):
