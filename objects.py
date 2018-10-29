@@ -9,6 +9,8 @@ class Resource:
         self.weight = random.randint(10,50) #grams
         self.area = random.randint(9,100) # m^2
         self.location = location
+        self.drop_point = None
+
         self.world = world
 
 

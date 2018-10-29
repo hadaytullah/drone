@@ -49,6 +49,9 @@ def get_neighbors(map, pos, moore=True):
 
 
 def get_h(pos, start, moore=True):
+    """
+        Calculates straight line distance between two points using pythagoras theorum a^2 + b^2 = c^2
+    """
     if not moore:
         return abs(pos[0] - start[0]) + abs(pos[1] - start[1])
     else:
@@ -57,7 +60,7 @@ def get_h(pos, start, moore=True):
 
 def astar(map, start, goal, moore=True):
     print('start {} goal {}'.format(start,goal))
-    """A* search.
+    """A* search. Starts from goal node and finds the start node. It is backward, i don't know why?
 
     :param numpy.ndarray map: Binary map, where zeros are passable cells.
     :param tuple start: Starting cell's coordinate
@@ -70,7 +73,7 @@ def astar(map, start, goal, moore=True):
     """
 
     # Already looked list
-    closed = {}
+    seen = {}
     # Do the usual from goal to start switch for search.
     # (If the agent moves its position, but the goal stays the same,
     # we could use the cached results of the previous search.)
@@ -93,21 +96,21 @@ def astar(map, start, goal, moore=True):
             path = construct_path(node)
             return path
 
-        for n_pos in get_neighbors(map, node.pos, moore=moore):
-            g = node.g + 1
-            h = get_h(n_pos, start, moore=moore)
-            f = g + h
-            new_node = SearchNode(n_pos, node, g=g, h=h, f=f)
-            #print("Considering neighbor {} with f={}".format(n_pos, f))
-            if n_pos in closed:
-                closed_node = closed[n_pos]
-                if new_node.f < closed_node.f:
-                    del closed[n_pos]
+        for neighbor_position in get_neighbors(map, node.pos, moore=moore):
+            g = node.g + 1 # cost unit is 1
+            h = get_h(neighbor_position, start, moore=moore) #straight line distance
+            f = g + h # Fitness
+            new_node = SearchNode(neighbor_position, node, g=g, h=h, f=f)
+            #print("Considering neighbor {} with f={}".format(neighbor_position, f))
+            if neighbor_position in seen:
+                seen_node = seen[neighbor_position]
+                if new_node.f < seen_node.f:
+                    del seen[neighbor_position]
                     open.add_task(new_node, priority=f)
             else:
                 open.add_task(new_node, priority=f)
 
-        closed[node.pos] = node
+        seen[node.pos] = node
 
 
 def construct_path(start_node):
