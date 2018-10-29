@@ -24,6 +24,16 @@ class World:
         #self.drop_points = [[],[]]
         #self.resource_points = [[],[]]
         #self.recharge_points = [[],[]]
+        self.clock = 0
+        self.resource_timestamp = 0
+        self.RESOURCE_INJECTION_PERIOD = 100
+
+    def step(self):
+        self.clock += 1
+
+        if(self.clock - self.resource_timestamp > self.RESOURCE_INJECTION_PERIOD):
+            self.resource_timestamp = self.clock
+            self.generate_resources()
 
     def campus(self):
         points = [ [math.floor(self.y_max*0.25), math.floor(self.x_max*0.25)], [math.floor(self.y_max*0.75), math.floor(self.x_max*0.25)], [math.floor(self.y_max*0.25), math.floor(self.x_max*0.75)],[math.floor(self.y_max*0.75), math.floor(self.x_max*0.75)]]
@@ -62,6 +72,70 @@ class World:
             x = random.randint(0,self.x_max-1)
             y = random.randint(0,self.y_max-1)
             self.draw_block(x,y, z=random.randint(self.MIN_OBJECT_HEIGHT, self.MAX_OBJECT_HEIGHT), radius = random.randint(1,5))
+
+        if drop_points:
+            self.drop_points = [[5,10,20,40,45],[5,10,20,40,45]]
+
+        if resource_points:
+            self.generate_resources()
+
+        if recharge_points:
+            self.recharge_points = [random.sample(range(self.x_max), 10), random.sample(range(self.y_max), 10)]
+
+    def generate_city(self, resource_points=False, drop_points=False, recharge_points=False):
+        self.map = np.zeros((self.y_max, self.x_max)) #np.random.randint(2, size=(self.width,self.height))
+
+        building_y = 0
+        while building_y < self.y_max:
+            building_x = 0
+            while building_x < self.x_max:
+                self.draw_block(building_x,building_y, z=random.randint(self.MIN_OBJECT_HEIGHT, self.MAX_OBJECT_HEIGHT), radius = random.randint(1,5))
+                building_x += int(0.10 * self.x_max)
+
+            building_y += int(0.10 * self.y_max)
+
+
+        #horizontal roads
+        road_y = 0
+        while road_y < self.y_max:
+            self.map[road_y] = 0
+            road_y += int((0.25)*self.y_max)
+
+        #vertical roads
+        road_x = 0
+        while road_x < self.x_max:
+            self.map[0:self.y_max, road_x] = 0
+            road_x += int((0.25)*self.x_max)
+
+
+        if drop_points:
+            self.drop_points = [[5,10,20,40,45],[5,10,20,40,45]]
+
+        if resource_points:
+            self.generate_resources()
+
+        if recharge_points:
+            self.recharge_points = [random.sample(range(self.x_max), 10), random.sample(range(self.y_max), 10)]
+
+    def generate_with_roads(self, resource_points=False, drop_points=False, recharge_points=False):
+        self.map = np.zeros((self.y_max, self.x_max)) #np.random.randint(2, size=(self.width,self.height))
+        for i in range(math.floor(self.x_max)):
+            x = random.randint(0,self.x_max-1)
+            y = random.randint(0,self.y_max-1)
+            self.draw_block(x,y, z=random.randint(self.MIN_OBJECT_HEIGHT, self.MAX_OBJECT_HEIGHT), radius = random.randint(1,5))
+
+        #horizontal roads
+        road_y = 0
+        while road_y < self.y_max:
+            self.map[road_y] = 0
+            road_y += int((0.25)*self.y_max)
+
+        #vertical roads
+        road_x = 0
+        while road_x < self.x_max:
+            self.map[0:self.y_max, road_x] = 0
+            road_x += int((0.25)*self.x_max)
+
 
         if drop_points:
             self.drop_points = [[5,10,20,40,45],[5,10,20,40,45]]

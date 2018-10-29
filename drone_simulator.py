@@ -15,7 +15,8 @@ class DroneSimulator:
         self.y_max = 50
         self.world = World(self.x_max, self.y_max)
         #self.world.random()
-        self.world.generate(resource_points=True, drop_points = True, recharge_points=True)
+        #self.world.generate_with_roads(resource_points=True, drop_points = True, recharge_points=True)
+        self.world.generate_city(resource_points=True, drop_points = True, recharge_points=True)
 
         # drones may have different charaterisics, battery size, max lift, max weight carrying capacity, turning abilities? some might make only right turns?
         self.drones = []
@@ -25,11 +26,11 @@ class DroneSimulator:
         self.drone_alpha = Drone('URBAN0X1', self.world,self.message_dispatcher, cooperate=True)
         self.drones.append(self.drone_alpha)
 
-        #self.drone_beta = Drone('URBAN0X2', self.world,self.message_dispatcher, cooperate=True)
-        #self.drones.append(self.drone_alpha)
+        self.drone_beta = Drone('URBAN0X2', self.world,self.message_dispatcher, cooperate=True)
+        self.drones.append(self.drone_beta)
 
         #self.drone_gamma = Drone('URBAN0X3', self.world,self.message_dispatcher, cooperate=False)
-        #self.drones.append(self.drone_alpha)
+        #self.drones.append(self.drone_gamma)
 
 
 
@@ -131,6 +132,7 @@ class DroneSimulator:
 
         #drone_locations_y = []
         #drone_locations_x = []
+        self.world.step()
         for i,drone in enumerate(self.drones):
             drone.move()
             #print(drone.location_plot)

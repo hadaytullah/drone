@@ -15,11 +15,15 @@ class Drone:
         #self.block = np.array([[-1,-1],[0,-1],[1,-1],[1,0],[0,0],[1,1],[0,1],[-1,1],[-1,0]])
 
         #put drones in the actual_world
-        self.location = [int(self.actual_world.y_max/2), int(self.actual_world.x_max/2)]
+        #self.location = [int(self.actual_world.y_max/2), int(self.actual_world.x_max/2)]
+        self.location = [0,0]
+        #self.drone_height = self.actual_world.MAX_OBJECT_HEIGHT+5
+
         if self.actual_world.map[tuple(self.location)] is 0:
             self.drone_height = int(self.actual_world.MAX_OBJECT_HEIGHT/2)
         else:
-            self.drone_height = 5 + self.actual_world.map[tuple(self.location)] #int(self.actual_world.MAX_OBJECT_HEIGHT/2)
+            self.drone_height = 5 + self.actual_world.map[tuple(self.location)]
+            #int(self.actual_world.MAX_OBJECT_HEIGHT/2)
         #self.location_as_grid = np.zeros((self.actual_world.y_max, self.actual_world.x_max))
         #self.under_drone_map_value = self.actual_world.map[tuple(self.location)]
         #self.actual_world.map[tuple(self.location)] = self.drone_height
@@ -111,7 +115,11 @@ class Drone:
         else:
             #point = self.current_path.pop(0)
             #if len(self.current_path) is 1: # at destination
-            if self.move_to_point(list(self.current_path.pop(0))) is False: # Hit a road block
+            #if self.move_to_point(list(self.current_path.pop(0))) is False: # Hit a road block
+            point = self.current_path.pop(0)
+            if self.actual_world.map[point] < self.drone_height:
+                self.location = list(point)
+            else:
                 #Re-routing
                 self.impassable_map = (self.world.map >  self.drone_height).astype(int)
                 start = tuple(self.location)
