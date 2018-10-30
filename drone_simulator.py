@@ -26,8 +26,8 @@ class DroneSimulator:
         self.drone_alpha = Drone('URBAN0X1', self.world,self.message_dispatcher, cooperate=True)
         self.drones.append(self.drone_alpha)
 
-        self.drone_beta = Drone('URBAN0X2', self.world,self.message_dispatcher, cooperate=True)
-        self.drones.append(self.drone_beta)
+        #self.drone_beta = Drone('URBAN0X2', self.world,self.message_dispatcher, cooperate=True)
+        #self.drones.append(self.drone_beta)
 
         #self.drone_gamma = Drone('URBAN0X3', self.world,self.message_dispatcher, cooperate=False)
         #self.drones.append(self.drone_gamma)
@@ -39,8 +39,10 @@ class DroneSimulator:
         #self.world.drop_point_locations = [random.sample(range(self.world.x_max), 10), random.sample(range(self.world.y_max), 10)]
         self.drop_point_plot = None
 
+
         #reacharge point
         self.recharge_point_marker = '<'
+        self.recharge_point_plot = None
 
         #resources
         #self.fig = plt.figure(figsize=(1, 2))#, dpi=80, facecolor='w', edgecolor='k')
@@ -102,15 +104,24 @@ class DroneSimulator:
         self.world_plot = self.init_plot(location=plot_location, title='World')
         self.world_image = self.world_plot.imshow(self.world.map, cmap='Blues', interpolation='nearest', vmin=self.world.MIN_OBJECT_HEIGHT, vmax=self.world.MAX_OBJECT_HEIGHT, animated=False)
 
-        #Let there be drop points
-        self.drop_point_plot = (self.world_plot.plot(self.world.drop_points[1], self.world.drop_points[0], color=self.colors.pop(), linestyle='', marker=self.drop_point_marker, markerfacecolor='white', markersize=3))[0]
+
+
+        #self.drop_point_plot = (self.world_plot.plot(self.world.drop_points[1], self.world.drop_points[0], color=self.colors.pop(), linestyle='', marker=self.drop_point_marker, markerfacecolor='white', markersize=3))[0]
 
         #Let there be resources
-        x, y = self.world.get_resource_points()
-        self.resource_plot = (self.world_plot.plot(x, y, color=self.colors.pop(), linestyle='', marker=self.resource_marker, markerfacecolor='white', markersize=3))[0]
+        resources_x, resources_y = self.world.get_resource_points()
+        self.resource_plot = (self.world_plot.plot(resources_x, resources_y, color=self.colors.pop(), linestyle='', marker=self.resource_marker, markerfacecolor='white', markersize=3))[0]
         #plt.gca().invert_yaxis()
 
+        #Let there be drop points
+        drop_points_x, drop_points_y = self.world.get_drop_points()
+        self.drop_point_plot = (self.world_plot.plot(drop_points_x, drop_points_y, color=self.colors.pop(), linestyle='', marker=self.drop_point_marker, markerfacecolor='white', markersize=3))[0]
+
         #Let there be recharge points
+        #Let there be drop points
+        recharge_points_x, recharge_points_y = self.world.get_recharge_points()
+        self.recharge_point_plot = (self.world_plot.plot(recharge_points_x, recharge_points_y, color=self.colors.pop(), linestyle='', marker=self.recharge_point_marker, markerfacecolor='white', markersize=3))[0]
+
 
         # Let there be drones
         #self.fig_drone_0 = plt.figure(figsize=(1, 2))#, dpi=80, facecolor='w', edgecolor='k')
@@ -148,8 +159,16 @@ class DroneSimulator:
         #    self.drone_world_plot_0.set_data(self.drones[0].world.map)
 
         self.world_image.set_data(self.world.map)
+
         x, y = self.world.get_resource_points()
         self.resource_plot.set_data([x],[y])
+
+        drop_point_x, drop_point_y = self.world.get_drop_points()
+        self.drop_point_plot.set_data([drop_point_x],[drop_point_y])
+
+        recharge_point_x, recharge_point_y = self.world.get_recharge_points()
+        self.recharge_point_plot.set_data([recharge_point_x],[recharge_point_y])
+
         #self.world_drone_plot.set_data([drone_locations_x,drone_locations_y])
         #self.im.set_array(self.luminosity)
         #self.im.set_facecolors(self.luminosity)

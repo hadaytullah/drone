@@ -1,7 +1,7 @@
 import numpy as np
 import math
 import random
-from objects import Resource
+from objects import Resource, DropPoint, RechargePoint
 
 
 class World:
@@ -20,6 +20,7 @@ class World:
 
         self.resource_objects = {}
         self.drop_point_objects ={}
+        self.recharge_point_objects ={}
 
         #self.drop_points = [[],[]]
         #self.resource_points = [[],[]]
@@ -31,9 +32,9 @@ class World:
     def step(self):
         self.clock += 1
 
-        if(self.clock - self.resource_timestamp > self.RESOURCE_INJECTION_PERIOD):
-            self.resource_timestamp = self.clock
-            self.generate_resources()
+#        if(self.clock - self.resource_timestamp > self.RESOURCE_INJECTION_PERIOD):
+#            self.resource_timestamp = self.clock
+#            self.generate_resources()
 
     def campus(self):
         points = [ [math.floor(self.y_max*0.25), math.floor(self.x_max*0.25)], [math.floor(self.y_max*0.75), math.floor(self.x_max*0.25)], [math.floor(self.y_max*0.25), math.floor(self.x_max*0.75)],[math.floor(self.y_max*0.75), math.floor(self.x_max*0.75)]]
@@ -45,26 +46,56 @@ class World:
 
         #return world
 
+    #--------------- Objects: Resource, Drop-point, Recharge-point ----------------
     def get_resource_points(self):
+        return self.get_object_points(self.resource_objects)
+
+    def get_drop_points(self):
+        return self.get_object_points(self.drop_point_objects)
+
+    def get_recharge_points(self):
+        return self.get_object_points(self.recharge_point_objects)
+
+    def get_object_points(self, obj_dict):
         y=[]
         x=[]
-        for key, resource in self.resource_objects.items():
-            y.append(resource.location[0])
-            x.append(resource.location[1])
+        for key, obj in obj_dict.items():
+            y.append(obj.location[0])
+            x.append(obj.location[1])
         return x, y
 
     def remove_object(self, the_object):
         if isinstance(the_object, Resource):
             self.resource_objects.pop(the_object.get_id_by_location())
 
+        elif isinstance(the_object, DropPoint):
+            self.drop_point_objects.pop(the_object.get_id_by_location())
+
+        elif isinstance(the_object, RechargePoint):
+            self.recharge_point_objects.pop(the_object.get_id_by_location())
+
     def generate_resources(self):
         for x in range(10):
             resource_location = [random.randint(0,self.y_max), random.randint(0,self.x_max)]
-            print('Resource location {}'.format(resource_location))
+            #print('Resource location {}'.format(resource_location))
             resource = Resource(resource_location, self)
             self.resource_objects[resource.get_id_by_location()]= resource
 
         #self.resource_points = [random.sample(range(self.y_max), 10), random.sample(range(self.x_max), 10)]
+
+    def generate_drop_points(self):
+        for x in range(10):
+            drop_point_location = [random.randint(0,self.y_max), random.randint(0,self.x_max)]
+            #print('Resource location {}'.format(resource_location))
+            drop_point = DropPoint(drop_point_location, self)
+            self.drop_point_objects[drop_point.get_id_by_location()]= drop_point
+
+    def generate_recharge_points(self):
+        for x in range(10):
+            location = [random.randint(0,self.y_max), random.randint(0,self.x_max)]
+            #print('Resource location {}'.format(resource_location))
+            recharge_point = RechargePoint(location, self)
+            self.recharge_point_objects[recharge_point.get_id_by_location()]= recharge_point
 
     def generate(self, resource_points=False, drop_points=False, recharge_points=False):
         self.map = np.zeros((self.y_max, self.x_max)) #np.random.randint(2, size=(self.width,self.height))
@@ -109,13 +140,16 @@ class World:
 
 
         if drop_points:
-            self.drop_points = [[5,10,20,40,45],[5,10,20,40,45]]
+            #self.drop_points = [[5,10,20,40,45],[5,10,20,40,45]]
+            self.generate_drop_points()
 
         if resource_points:
             self.generate_resources()
 
         if recharge_points:
-            self.recharge_points = [random.sample(range(self.x_max), 10), random.sample(range(self.y_max), 10)]
+            self.generate_recharge_points()
+
+            #self.recharge_points = [random.sample(range(self.x_max), 10), random.sample(range(self.y_max), 10)]
 
     def generate_with_roads(self, resource_points=False, drop_points=False, recharge_points=False):
         self.map = np.zeros((self.y_max, self.x_max)) #np.random.randint(2, size=(self.width,self.height))
