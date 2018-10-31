@@ -76,7 +76,7 @@ class World:
 
     def generate_resources(self):
         for x in range(10):
-            resource_location = [random.randint(0,self.y_max), random.randint(0,self.x_max)]
+            resource_location = [random.randint(0,self.y_max-1), random.randint(0,self.x_max-1)]
             #print('Resource location {}'.format(resource_location))
             resource = Resource(resource_location, self)
             self.resource_objects[resource.get_id_by_location()]= resource
@@ -85,14 +85,14 @@ class World:
 
     def generate_drop_points(self):
         for x in range(10):
-            drop_point_location = [random.randint(0,self.y_max), random.randint(0,self.x_max)]
+            drop_point_location = [random.randint(0,self.y_max-1), random.randint(0,self.x_max-1)]
             #print('Resource location {}'.format(resource_location))
             drop_point = DropPoint(drop_point_location, self)
             self.drop_point_objects[drop_point.get_id_by_location()]= drop_point
 
     def generate_recharge_points(self):
         for x in range(10):
-            location = [random.randint(0,self.y_max), random.randint(0,self.x_max)]
+            location = [random.randint(0,self.y_max-1), random.randint(0,self.x_max-1)]
             #print('Resource location {}'.format(resource_location))
             recharge_point = RechargePoint(location, self)
             self.recharge_point_objects[recharge_point.get_id_by_location()]= recharge_point

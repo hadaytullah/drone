@@ -29,8 +29,8 @@ class Resource (MapObject):
     """
     def __init__(self, location, world):
         super().__init__(location, world)
-        self.weight = random.randint(10,50) #grams
-        self.area = random.randint(9,100) # m^2
+        self.weight = 10 #random.randint(10,50) #grams
+        self.area = 10 # random.randint(9,100) # m^2
 
 
 class RechargePoint(MapObject):

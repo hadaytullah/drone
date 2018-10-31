@@ -46,7 +46,7 @@ class Drone:
         # profile
         self.owner = 'COMPANY-'+random.choice(['X','Y','Z'])
         self.BATTERY_MAX = 600 # units
-        self.CARRYING_CAPACITY_MAX = 150 #grams
+        self.CARRYING_CAPACITY_MAX = 20 #grams
 
         self.battery_remaining = self.BATTERY_MAX
         self.weight_carrying = 0
