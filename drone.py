@@ -68,19 +68,6 @@ class Drone:
     def __str__(self):
         return 'Drone:{}, Goal:{}, Height:{},  Battery:{}, Carrying:{}'.format(self.uid, self.goal, self.drone_height, self.battery_remaining, self.weight_carrying)
 
-    def receive(self, message):
-        if self.cooperate:
-            if message.sender is not self: #avoid own messages
-                if isinstance(message, Message):
-                    #print ('Message Recieved {} from Agent {}, points {}'.format(message.uid, message.sender.uid, len(message.points)))
-                    for index, point in enumerate(message.points):
-                        if point[0] in range(self.world.y_max) and point[1] in range(self.world.x_max):
-                            self.world.map[tuple(point)] = message.points_info[index]
-
-    def send(self, points, points_info):
-        if self.cooperate:
-            message = Message(self, points, points_info)
-            self.message_dispatcher.broadcast(message)
 
     def move(self):
         print(self.__str__())
@@ -94,38 +81,6 @@ class Drone:
         else:
             print('Drone {} out of power'.format(self.uid))
 
-    def move_in_actual_world(self):
-        print('Drone {} Height:{}'.format(self.uid, self.drone_height))
-        if len(self.current_path) is 0:
-
-            self.impassable_map = (self.actual_world.map >  self.drone_height).astype(int)
-
-            print('impassable {}'.format(self.impassable_map))
-            start = tuple(self.location) #(0, 0)
-            #index = random.choice(range(len(self.actual_world.resource_points[0])))
-            #random.choice(self.actual_world.resource_objects)
-            if self.goal is self.GOAL_PICK:
-                obj_id, self.destination_object = random.choice(list(self.actual_world.resource_objects.items()))
-            elif self.goal is self.GOAL_DROP:
-                obj_id, self.destination_object = random.choice(list(self.actual_world.drop_point_objects.items()))
-            elif self.goal is self.GOAL_RECHARGE:
-                obj_id, self.destination_object = random.choice(list(self.actual_world.recharge_point_objects.items()))
-
-            # goal = (self.actual_world.resource_points[0][index], self.actual_world.resource_points[1][index])#(9, 9)
-            #self.goal_location = tuple(resource.location)
-            self.current_path = astar(self.impassable_map, start, tuple(self.destination_object.location), moore=True)
-            print(self.current_path)
-        else:
-            #point = self.current_path.pop(0)
-            #if len(self.current_path) is 1: # at destination
-            self.move_to_point(list(self.current_path.pop(0)))
-
-        if self.destination_object:
-            if self.location == self.destination_object.location:
-                self.destination_object.apply_drone(self)
-                self.destination_object = None
-
-        #self.move_random_by_height()
     def evaluate_goal(self):
         if self.battery_remaining < 300:
             self.goal = self.GOAL_RECHARGE
@@ -213,33 +168,6 @@ class Drone:
         #print('Drone-location:', drone_new_location)
         self.move_to_point(drone_new_location)
 
-    def move_random_by_height (self):
-        points = self.location + self.block
-        #print(points)
-
-        valid_points = []
-        for point in points:
-            if point[0] in range(self.actual_world.y_max) and point[1] in range(self.actual_world.x_max):
-                if self.actual_world.map[tuple(point)] < self.drone_height:
-                    valid_points.append(point)
-
-        if len(valid_points):
-            drone_new_location = random.choice (valid_points)
-            #print('Drone-location:', drone_new_location)
-            self.move_to_point(drone_new_location)
-
-    def share_info(self):
-        points = self.location + self.block
-        share_points = []
-        share_points_info = []
-
-        for point in points:
-            if point[0] in range(self.world.y_max) and point[1] in range(self.world.x_max):
-                share_points.append(point)
-                share_points_info.append(self.actual_world.map[tuple(point)])
-
-        self.send(share_points, share_points_info)
-
     def update_drone_world (self):
         points = self.location + self.block
         for point in points:
@@ -259,6 +187,88 @@ class Drone:
 
         #self.location_as_grid[tuple(self.location)] = 0
         #self.location_as_grid[tuple(point)] = self.drone_height
+
+    # ---------- Cooperation -------------
+    def share_info(self):
+        points = self.location + self.block
+        share_points = []
+        share_points_info = []
+
+        for point in points:
+            if point[0] in range(self.world.y_max) and point[1] in range(self.world.x_max):
+                share_points.append(point)
+                share_points_info.append(self.actual_world.map[tuple(point)])
+
+        self.send(share_points, share_points_info)
+
+    def receive(self, message):
+        if self.cooperate:
+            if message.sender is not self: #avoid own messages
+                if isinstance(message, Message):
+                    #print ('Message Recieved {} from Agent {}, points {}'.format(message.uid, message.sender.uid, len(message.points)))
+                    for index, point in enumerate(message.points):
+                        if point[0] in range(self.world.y_max) and point[1] in range(self.world.x_max):
+                            self.world.map[tuple(point)] = message.points_info[index]
+
+    def send(self, points, points_info):
+        if self.cooperate:
+            message = Message(self, points, points_info)
+            self.message_dispatcher.broadcast(message)
+
+    # ------ Earlier experimentation code, do not delete ---------
+#    def move_random (self):
+#        points = self.location + self.block
+#        #print(points)
+#        drone_new_location = random.choice (points)
+#        #print('Drone-location:', drone_new_location)
+#        self.move_to_point(drone_new_location)
+#
+#    def move_in_actual_world(self):
+#        print('Drone {} Height:{}'.format(self.uid, self.drone_height))
+#        if len(self.current_path) is 0:
+#
+#            self.impassable_map = (self.actual_world.map >  self.drone_height).astype(int)
+#
+#            print('impassable {}'.format(self.impassable_map))
+#            start = tuple(self.location) #(0, 0)
+#            #index = random.choice(range(len(self.actual_world.resource_points[0])))
+#            #random.choice(self.actual_world.resource_objects)
+#            if self.goal is self.GOAL_PICK:
+#                obj_id, self.destination_object = random.choice(list(self.actual_world.resource_objects.items()))
+#            elif self.goal is self.GOAL_DROP:
+#                obj_id, self.destination_object = random.choice(list(self.actual_world.drop_point_objects.items()))
+#            elif self.goal is self.GOAL_RECHARGE:
+#                obj_id, self.destination_object = random.choice(list(self.actual_world.recharge_point_objects.items()))
+#
+#            # goal = (self.actual_world.resource_points[0][index], self.actual_world.resource_points[1][index])#(9, 9)
+#            #self.goal_location = tuple(resource.location)
+#            self.current_path = astar(self.impassable_map, start, tuple(self.destination_object.location), moore=True)
+#            print(self.current_path)
+#        else:
+#            #point = self.current_path.pop(0)
+#            #if len(self.current_path) is 1: # at destination
+#            self.move_to_point(list(self.current_path.pop(0)))
+#
+#        if self.destination_object:
+#            if self.location == self.destination_object.location:
+#                self.destination_object.apply_drone(self)
+#                self.destination_object = None
+
+        #self.move_random_by_height()
+#    def move_random_by_height (self):
+#        points = self.location + self.block
+#        #print(points)
+#
+#        valid_points = []
+#        for point in points:
+#            if point[0] in range(self.actual_world.y_max) and point[1] in range(self.actual_world.x_max):
+#                if self.actual_world.map[tuple(point)] < self.drone_height:
+#                    valid_points.append(point)
+#
+#        if len(valid_points):
+#            drone_new_location = random.choice (valid_points)
+#            #print('Drone-location:', drone_new_location)
+#            self.move_to_point(drone_new_location)
 
 #    def move_to_point (self, point):
 #        self.actual_world.map[tuple(self.location)] = self.under_drone_map_value

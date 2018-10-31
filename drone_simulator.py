@@ -56,25 +56,6 @@ class DroneSimulator:
 
         #
 
-#    def create_plot(self, location, title, data, plot_cmap='gray_r', plot_interpolation='nearest', plot_vmin=0, plot_vmax=1, plot_animated=False):
-#        plot = self.fig.add_subplot(location)
-#        plot.set_title(title, y=1.08)
-#        plot.xaxis.tick_top()
-#        #presence_plot_x, presence_plot_y = np.meshgrid(np.arange(self.width), np.arange(self.height))
-#        plt.gca().invert_yaxis()
-#        #presence_plot.scatter(presence_plot_x, presence_plot_y, c=self.presence, cmap='gray_r', marker='+')
-#        #presence_plot.grid(color='g', linestyle='-', linewidth=1)
-#        #presence_draw_array = np.where(self.presence<1, 1, 0)
-#        plot.set_xticks(np.arange(self.x_max)+0.5)
-#        plot.set_yticks(np.arange(self.y_max)+0.5)
-#        plot.set_yticklabels([])
-#        plot.set_xticklabels([])
-#        image = plot.imshow(data, cmap=plot_cmap, interpolation=plot_interpolation, vmin=plot_vmin, vmax=plot_vmax, animated=plot_animated)
-#        plot = plot.plot([0], [0], color=self.colors.pop(), linestyle='', marker=self.markers.pop(),
-#     markerfacecolor='red', markersize=3)  # for lines
-#        #plt.imshow(data, cmap=plot_cmap, interpolation=plot_interpolation, vmin=plot_vmin, vmax=plot_vmax, animated=plot_animated)
-#        #plt.grid()
-#        return image, plot[0]
 
     def init_plot(self, location, title):
         plot = self.fig.add_subplot(location)
@@ -188,3 +169,23 @@ class DroneSimulator:
         self.ani = animation.FuncAnimation(self.fig, self.update, interval=50, blit=True)
         #self.update([])
         plt.show()
+
+#    def create_plot(self, location, title, data, plot_cmap='gray_r', plot_interpolation='nearest', plot_vmin=0, plot_vmax=1, plot_animated=False):
+#        plot = self.fig.add_subplot(location)
+#        plot.set_title(title, y=1.08)
+#        plot.xaxis.tick_top()
+#        #presence_plot_x, presence_plot_y = np.meshgrid(np.arange(self.width), np.arange(self.height))
+#        plt.gca().invert_yaxis()
+#        #presence_plot.scatter(presence_plot_x, presence_plot_y, c=self.presence, cmap='gray_r', marker='+')
+#        #presence_plot.grid(color='g', linestyle='-', linewidth=1)
+#        #presence_draw_array = np.where(self.presence<1, 1, 0)
+#        plot.set_xticks(np.arange(self.x_max)+0.5)
+#        plot.set_yticks(np.arange(self.y_max)+0.5)
+#        plot.set_yticklabels([])
+#        plot.set_xticklabels([])
+#        image = plot.imshow(data, cmap=plot_cmap, interpolation=plot_interpolation, vmin=plot_vmin, vmax=plot_vmax, animated=plot_animated)
+#        plot = plot.plot([0], [0], color=self.colors.pop(), linestyle='', marker=self.markers.pop(),
+#     markerfacecolor='red', markersize=3)  # for lines
+#        #plt.imshow(data, cmap=plot_cmap, interpolation=plot_interpolation, vmin=plot_vmin, vmax=plot_vmax, animated=plot_animated)
+#        #plt.grid()
+#        return image, plot[0]
