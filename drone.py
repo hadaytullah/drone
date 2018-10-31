@@ -2,9 +2,9 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 import random
-from route_planner import RoutePlanner
+#from route_planner import RoutePlanner
 from world import World
-from message import Message
+from messaging import Message
 from search.astar import astar
 from objects import Resource, DropPoint, RechargePoint
 
