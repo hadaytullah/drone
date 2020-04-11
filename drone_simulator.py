@@ -166,7 +166,7 @@ class DroneSimulator:
         return self.world_image,
 
     def run(self):
-        self.ani = animation.FuncAnimation(self.fig, self.update, interval=50, blit=True)
+        self.ani = animation.FuncAnimation(self.fig, self.update, interval=50, blit=False)
         #self.update([])
         plt.show()
 
